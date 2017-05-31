@@ -1,7 +1,5 @@
 package com.company;
 
-import sun.misc.IOUtils;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,7 +7,7 @@ import java.io.*;
 import java.util.Scanner;
 
 /**
- * Created by jesper on 2017-05-31.
+ * Created by Famousjasper on 2017-05-31.
  */
 public class GUI extends JFrame{
     private JPanel Steganography;
