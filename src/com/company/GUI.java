@@ -4,7 +4,6 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
-import java.util.Scanner;
 
 /**
  * Created by Famousjasper on 2017-05-31.
@@ -60,11 +59,10 @@ public class GUI extends JFrame{
                             progressBar1.setValue(50);
                             progressBar1.setString("50%");
 
-                            Scanner sc = new Scanner(theMessageEditorPane.getText());
                             int jpgStartIndex = 0;
                             while(true){
                                 if((jpg[jpgStartIndex] == (byte)0xFF && jpg[jpgStartIndex+1] == (byte)0xDA)){
-                                    jpgStartIndex+=2; // Skip 0xFFDA
+                                    jpgStartIndex+=14; // Scan starts here
                                     break;
                                 }
                                 jpgStartIndex++;
@@ -74,14 +72,28 @@ public class GUI extends JFrame{
                             progressBar1.setString("60%");
 
                             int jpgIndex = jpgStartIndex;
+                            String msg = theMessageEditorPane.getText();
+                            try{
+                                for(int i = 0; i < msg.length(); i++){
+                                    byte b = (byte)msg.charAt(i);
+                                    for(int j = 7; j > -1; j--){
+                                        if(jpg[jpgIndex] != (byte)0xFF){
+                                            jpg[jpgIndex] = (byte)((int)jpg[jpgIndex] | ((b >>> j) & 0x01));
+                                            jpgIndex++;
+                                        }else{
+                                            if(jpg[jpgIndex+1] == (byte)0xD9){
+                                                throw new IndexOutOfBoundsException();
+                                            }
+                                            jpgIndex+=2;
+                                            jpg[jpgIndex] = (byte)((int)jpg[jpgIndex] | ((b >>> j) & 0x01));
+                                        }
 
-                            while(sc.hasNextByte()){
-                                byte b = sc.nextByte();
-                                for(int i = 7; i > 0; i--){
-                                    jpg[jpgIndex] = (byte)((int)jpg[jpgIndex] | ((b >>> i) & 0x01));
-                                    jpgIndex++;
+                                    }
                                 }
+                            }catch(IndexOutOfBoundsException ex){
+                                JOptionPane.showMessageDialog(theMessageEditorPane, "Parts of your message have been removed because it was too big");
                             }
+
                             //increase progress
                             progressBar1.setValue(90);
                             progressBar1.setString("90%");
